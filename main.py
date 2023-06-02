@@ -11,17 +11,22 @@ target_folder = r'C:\GEOG485\Lesson2\Lesson2Data'
 template_shapefile = ap.GetParameterAsText()
 
 
-def reproject_in_place(in_shapefile, out_shapefile, desired_spatial_ref):
-    am.Project(in_shapefile,
-               out_shapefile + "projected",
-               ap.SpatialReference(template_shapefile),
-               None,
-               ap.SpatialReference(in_shapefile)
-               )
+def reproject_in_place(in_shapefile, desired_spatial_ref):
+    try:
+        am.Project(in_shapefile,
+                   os.path.join(in_shapefile, "_projected"),
+                   ap.SpatialReference(template_shapefile),
+                   None,
+                   ap.SpatialReference(in_shapefile)
+                   )
+    except:
+        pass
 
 
 def main(folder, shapefile):
-    pass
+    template_reference = ap.SpatialReference(template_shapefile)
+    for file in os.listdir(folder):
+        reproject_in_place(file, template_reference)
 
 
 if __name__ == '__main__':
