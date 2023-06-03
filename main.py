@@ -7,31 +7,40 @@ import arcpy as ap
 import arcpy.management as am
 import os
 
-target_folder = r'C:\GEOG485\Lesson2\Lesson2Data\CountyLines.shp'
+target_folder = r'C:\GEOG485\Lesson2\Lesson2Data'
 template_shapefile = r'C:\GEOG485\Lesson2\Lesson2Data\CityBoundaries.shp'  # ap.GetParameterAsText(1)
 
 
-def reproject_in_place(in_shapefile, template_shapefile):
+def get_spatial_reference(shapefile):
+    spatial_reference = ap.Describe(shapefile).spatialReference
+    print(spatial_reference)
+    return spatial_reference
+
+
+def reproject_in_place(shapefile, spatial_reference):
+    out_shapefile = os.path.join(target_folder, shapefile.split('.')[0]) + "_projected"
     try:
-        am.Project(in_shapefile,
-                   os.path.join(in_shapefile, "_projected"),
-                   ap.SpatialReference(template_shapefile),
-                   None,
-                   ap.SpatialReference(in_shapefile)
+        am.Project(shapefile,
+                   out_shapefile,
+                   spatial_reference,
                    )
-    except TypeError:
-        print("TypeError: Check arguments.")
+        print(f'Successfully reprojected file at {out_shapefile}')
+    except Exception:
+        print("Error with projection... skipped")
 
 
-def main(file, shapefile):
-    print(ap.SpatialReference(shapefile))
-    template_reference = ap.SpatialReference(shapefile)
-    reproject_in_place(file, template_reference)
+def main(folder, shapefile):
+    for file in os.listdir(folder):
+        try:
+            print(f'Accessing {file}...')
+            file_path = os.path.join(target_folder, file)
+            template_reference = get_spatial_reference(shapefile)
+            reproject_in_place(file_path, template_reference)
+
+        except Exception:
+            print("Error in main")
+            pass
 
 
 if __name__ == '__main__':
-    #main(target_folder, template_shapefile)
-    am.Project(target_folder,
-               os.path.join(r'C:\GEOG485\Lesson2\Lesson2Data\CountyLines_projected.shp'),
-               ap.Describe(template_shapefile).spatialReference,
-               None)
+    main(target_folder, template_shapefile)
