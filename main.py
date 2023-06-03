@@ -3,6 +3,7 @@ This was created for Penn State University GEOG485 Lesson 2 by Kurt Neinstedt.
 This script takes a folder directory and a shapefile path as inputs, and reprojects data in the folder directory
 to the projection of the shapefile.
 """
+
 import arcpy as ap
 import arcpy.management as am
 import os
